@@ -156,7 +156,7 @@ app.post("/api/login", (req, res) => {
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "10s" }
     );
 
     res.json({ message: "Login exitoso", token });

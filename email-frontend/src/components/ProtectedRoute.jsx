@@ -1,8 +1,15 @@
+// src/components/ProtectedRoute.jsx
 import React from "react";
-import { Outlet, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
-export default function ProtectedRoute() {
+export default function ProtectedRoute({ children }) {
   const { token } = useAuth();
-  return token ? <Outlet /> : <Navigate to="/login" replace />;
+
+  if (!token) {
+    // sin token, al login (y reemplaza historia)
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
 }
