@@ -27,17 +27,20 @@ export default function Login() {
   useEffect(() => {
     const saved = localStorage.getItem("rememberedEmail");
     if (saved) {
-      setForm(f => ({ ...f, email: saved }));
+      setForm((f) => ({ ...f, email: saved }));
       setRememberEmail(true);
     }
+
     const { expired, fromLogout } = location.state || {};
-    if (expired) {
-      setInfo("🔒 Tu sesión ha expirado. Por favor inicia sesión de nuevo.");
-      setBannerType("expired");
-    } else if (fromLogout) {
+    if (fromLogout) {
       setInfo("Has cerrado sesión correctamente.");
       setBannerType("logout");
+    } else if (expired) {
+      setInfo("🔒 Tu sesión ha expirado. Por favor inicia sesión de nuevo.");
+      setBannerType("expired");
     }
+
+    // clear the navigation state so banners don't reappear
     if (expired || fromLogout) {
       navigate(location.pathname, { replace: true, state: {} });
     }
@@ -60,40 +63,39 @@ export default function Login() {
     return () => clearTimeout(t);
   }, [error]);
 
-  const handleChange = e =>
-    setForm(f => ({ ...f, [e.target.name]: e.target.value }));
-  const handleRememberChange = e =>
-    setRememberEmail(e.target.checked);
+  const handleChange = (e) =>
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  const handleRememberChange = (e) => setRememberEmail(e.target.checked);
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Reset previous banners
+    // reset any existing banners
     setError("");
     setInfo("");
     setBannerType(null);
 
-    // Save or remove remembered email
+    // remember or forget email
     if (rememberEmail) {
       localStorage.setItem("rememberedEmail", form.email);
     } else {
       localStorage.removeItem("rememberedEmail");
     }
 
-    // 1. Show loading banner
+    // show loading banner
     setBannerType("loading");
     setInfo("⌛ Ingresando...");
     setIsLoading(true);
 
     try {
-      // 2. Perform login API call
-      const { token } = await apiLogin(form);
-      login(token);
+      // API call: extraemos accessToken del objeto
+      const { accessToken } = await apiLogin(form);
+      login(accessToken); // <-- guardamos el token en contexto
 
-      // 3. Switch to success banner
+      // success banner
       setBannerType("login");
       setInfo("✔️ Has iniciado sesión correctamente.");
 
-      // 4. Hold on success banner for 2 seconds, then navigate
+      // wait a moment, then redirect
       setTimeout(() => {
         setIsLoading(false);
         navigate("/dashboard", {
@@ -102,15 +104,15 @@ export default function Login() {
         });
       }, 2000);
     } catch (err) {
-      // On error, clear loading and show error banner
+      // on error, clear loading/banner info and show error
       setIsLoading(false);
+      setInfo(""); // hide any info banner
       setBannerType(null);
-      setInfo("");
       setError(err.response?.data?.error || "Error de autenticación");
     }
   };
 
-  // Determine banner styles
+  // banner styling map
   const bannerClasses =
     bannerType === "loading"
       ? "bg-gray-100 border border-gray-300 text-gray-800"
@@ -125,8 +127,8 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-md">
-        {/* Dynamic banner */}
-        {info && (
+        {/* Only show info banner when there's no error */}
+        {!error && info && (
           <div
             className={`${bannerClasses} px-4 py-2 rounded mb-4 flex items-center justify-center space-x-2`}
             role="status"
@@ -175,7 +177,7 @@ export default function Login() {
             </div>
           )}
 
-          {/* Email input */}
+          {/* Email */}
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -218,7 +220,7 @@ export default function Login() {
             </label>
           </div>
 
-          {/* Password input */}
+          {/* Password */}
           <div className="mb-6">
             <label
               htmlFor="password"
@@ -244,7 +246,7 @@ export default function Login() {
                 aria-label={
                   showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
                 }
-                onClick={() => setShowPassword(v => !v)}
+                onClick={() => setShowPassword((v) => !v)}
                 disabled={isLoading}
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 cursor-pointer text-gray-400 hover:text-gray-600 rounded disabled:opacity-50"
               >
@@ -257,7 +259,7 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Submit button */}
+          {/* Submit */}
           <button
             type="submit"
             disabled={isLoading}
@@ -268,7 +270,7 @@ export default function Login() {
             Ingresar
           </button>
 
-          {/* Forgot password */}
+          {/* Links */}
           <p className="mt-4 text-center text-gray-600 text-sm">
             <span
               onClick={() => alert("Funcionalidad no implementada")}
@@ -277,8 +279,6 @@ export default function Login() {
               ¿Olvidaste tu contraseña?
             </span>
           </p>
-
-          {/* Register */}
           <p className="mt-2 text-center text-gray-600 text-sm">
             ¿No tienes cuenta?{" "}
             <span

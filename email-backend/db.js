@@ -1,21 +1,26 @@
-const mysql = require('mysql2');
-const dotenv = require('dotenv');
+// email-backend/db.js
+const mysql = require("mysql2");
+const dotenv = require("dotenv");
 dotenv.config();
 
-const connection = mysql.createConnection({
+// Creamos un pool en lugar de una única conexión
+const pool = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  port: process.env.DB_PORT
+  port: process.env.DB_PORT,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
-connection.connect((err) => {
-  if (err) {
-    console.error('Error de conexión a MySQL:', err);
-    return;
-  }
-  console.log('Conectado a MySQL ✅');
-});
+// Opcional: promesas en lugar de callbacks
+const promisePool = pool.promise();
 
-module.exports = connection;
+promisePool
+  .query("SELECT 1")
+  .then(() => console.log("Pool de MySQL conectado ✅"))
+  .catch((err) => console.error("Error al conectar pool de MySQL:", err));
+
+module.exports = promisePool;

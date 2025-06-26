@@ -93,12 +93,14 @@ export default function Register() {
         password: form.password,
       });
       setSuccess("✅ ¡Registro exitoso! Redirigiendo al login...");
-      // Espero 2s para que lo lea
       setTimeout(() => {
         navigate("/login", { replace: true });
       }, 2000);
     } catch (err) {
-      setError(err.message || "Error al registrarse");
+      // mostramos el mensaje que venga del servidor o un fallback
+      setError(
+        err.response?.data?.error || err.message || "Error al registrarse"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -148,7 +150,8 @@ export default function Register() {
               placeholder="you@example.com"
               value={form.email}
               onChange={handleChange}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#082563]"
+              disabled={isLoading}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#082563] disabled:opacity-50"
             />
           </div>
         </div>
@@ -172,7 +175,8 @@ export default function Register() {
               placeholder="••••••••"
               value={form.password}
               onChange={handleChange}
-              className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#082563]"
+              disabled={isLoading}
+              className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#082563] disabled:opacity-50"
             />
             <button
               type="button"
@@ -180,7 +184,8 @@ export default function Register() {
                 showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
               }
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 cursor-pointer text-gray-400 hover:text-gray-600 rounded"
+              disabled={isLoading}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 cursor-pointer text-gray-400 hover:text-gray-600 rounded disabled:opacity-50"
             >
               {showPassword ? (
                 <EyeSlashIcon className="w-5 h-5" />
@@ -226,7 +231,8 @@ export default function Register() {
               placeholder="••••••••"
               value={form.confirm}
               onChange={handleChange}
-              className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#082563]"
+              disabled={isLoading}
+              className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#082563] disabled:opacity-50"
             />
             <button
               type="button"
@@ -234,7 +240,8 @@ export default function Register() {
                 showConfirm ? "Ocultar contraseña" : "Mostrar contraseña"
               }
               onClick={() => setShowConfirm((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 cursor-pointer text-gray-400 hover:text-gray-600 rounded"
+              disabled={isLoading}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 cursor-pointer text-gray-400 hover:text-gray-600 rounded disabled:opacity-50"
             >
               {showConfirm ? (
                 <EyeSlashIcon className="w-5 h-5" />

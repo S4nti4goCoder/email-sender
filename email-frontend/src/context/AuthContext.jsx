@@ -1,28 +1,27 @@
 // src/context/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-// ③ Importamos el default export (la instancia) y renombramos a "API"
-import API from "../services/api";
+import api from "../services/api";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
   const navigate = useNavigate();
   const [token, setToken] = useState(localStorage.getItem("token"));
 
-  // Inyectar el header Authorization
+  // Inyecta Authorization header
   useEffect(() => {
     if (token) {
-      API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     } else {
-      delete API.defaults.headers.common["Authorization"];
+      delete api.defaults.headers.common["Authorization"];
     }
   }, [token]);
 
-  // Interceptor para detectar expiración (401)
+  // Interceptor para capturar 401 (token expirado)
   useEffect(() => {
-    const id = API.interceptors.response.use(
+    const id = api.interceptors.response.use(
       (res) => res,
       (err) => {
         if (err.response?.status === 401) {
@@ -33,14 +32,16 @@ export const AuthProvider = ({ children }) => {
         return Promise.reject(err);
       }
     );
-    return () => API.interceptors.response.eject(id);
+    return () => api.interceptors.response.eject(id);
   }, [navigate]);
 
-  const login = (tok) => {
-    localStorage.setItem("token", tok);
-    setToken(tok);
+  // login: guarda el access token
+  const login = (accessToken) => {
+    localStorage.setItem("token", accessToken);
+    setToken(accessToken);
   };
 
+  // logout: limpia y redirige
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
@@ -52,4 +53,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}
