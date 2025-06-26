@@ -2,10 +2,14 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
+  baseURL: "http://localhost:3000",               // o tu VITE_API_URL si lo prefieres
   headers: { "Content-Type": "application/json" },
 });
 
+// ① Exportación por defecto de la instancia
+export default API;
+
+// ② Exports nombrados para registro y login
 export function register(data) {
   return API.post("/api/register", data).then((r) => r.data);
 }

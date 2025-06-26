@@ -1,3 +1,4 @@
+// index.js
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -19,7 +20,7 @@ app.get("/", (req, res) => {
   res.send("Email backend is running");
 });
 
-// Protected route: profile
+// Perfil (protegido)
 app.get("/api/profile", authenticateToken, (req, res) => {
   res.json({
     message: "Perfil cargado correctamente",
@@ -27,22 +28,20 @@ app.get("/api/profile", authenticateToken, (req, res) => {
   });
 });
 
-// Protected route: get user emails
+// Obtener historial de emails (protegido)
 app.get("/api/emails", authenticateToken, (req, res) => {
   const userId = req.user.id;
-
   const sql = `SELECT * FROM emails WHERE user_id = ? ORDER BY created_at DESC`;
   connection.query(sql, [userId], (err, results) => {
     if (err) {
       console.error("Error al obtener emails:", err);
       return res.status(500).json({ error: "Error en la base de datos" });
     }
-
     res.json({ emails: results });
   });
 });
 
-// Send email function
+// Función para enviar email
 const sendEmail = async ({ recipient, subject, message }) => {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
@@ -62,16 +61,14 @@ const sendEmail = async ({ recipient, subject, message }) => {
   });
 };
 
-// Send and save email (with user_id)
+// Enviar y guardar email (protegido)
 app.post("/api/emails", authenticateToken, async (req, res) => {
   const { recipient, subject, message, attachment, scheduled_for } = req.body;
   const userId = req.user.id;
-
   const sql = `
     INSERT INTO emails (user_id, recipient, subject, message, attachment, scheduled_for)
     VALUES (?, ?, ?, ?, ?, ?)
   `;
-
   connection.query(
     sql,
     [
@@ -87,7 +84,6 @@ app.post("/api/emails", authenticateToken, async (req, res) => {
         console.error("Error al insertar email:", err);
         return res.status(500).json({ error: "Error en la base de datos" });
       }
-
       try {
         await sendEmail({ recipient, subject, message });
         res.status(201).json({
@@ -102,10 +98,9 @@ app.post("/api/emails", authenticateToken, async (req, res) => {
   );
 });
 
-// Register user (sin campo name)
+// Registro de usuario
 app.post("/api/register", async (req, res) => {
   const { email, password } = req.body;
-
   if (!email || !password)
     return res.status(400).json({ error: "Email y contraseña son requeridos" });
 
@@ -120,7 +115,6 @@ app.post("/api/register", async (req, res) => {
         console.error("Error en registro:", err);
         return res.status(500).json({ error: "Error en la base de datos" });
       }
-
       res.status(201).json({
         message: "Usuario registrado exitosamente",
         userId: result.insertId,
@@ -132,10 +126,9 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-// Login user
+// Login de usuario — aquí ajustamos la expiración a 1 hora
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
-
   if (!email || !password)
     return res.status(400).json({ error: "Email y contraseña son requeridos" });
 
@@ -153,10 +146,11 @@ app.post("/api/login", (req, res) => {
     if (!validPassword)
       return res.status(401).json({ error: "Credenciales inválidas" });
 
+    // Expiración cambiada a 1 hora
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "10s" }
+      { expiresIn: "1h" }
     );
 
     res.json({ message: "Login exitoso", token });

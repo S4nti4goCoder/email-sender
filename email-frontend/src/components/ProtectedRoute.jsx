@@ -1,15 +1,15 @@
 // src/components/ProtectedRoute.jsx
-import React from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext.jsx";
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-export default function ProtectedRoute({ children }) {
+const ProtectedRoute = ({ children }) => {
   const { token } = useAuth();
-
   if (!token) {
-    // sin token, al login (y reemplaza historia)
     return <Navigate to="/login" replace />;
   }
+  return <>{children}</>;
+};
 
-  return children;
-}
+// 👉 Exportamos como default para que coincida con el import en App.jsx
+export default ProtectedRoute;
