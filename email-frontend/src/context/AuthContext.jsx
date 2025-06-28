@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
   const navigate = useNavigate();
   const [token, setToken] = useState(localStorage.getItem("token"));
 
-  // Inyecta Authorization header
+  // Cada vez que el token cambie, actualizamos el header Authorization
   useEffect(() => {
     if (token) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -19,12 +19,13 @@ export function AuthProvider({ children }) {
     }
   }, [token]);
 
-  // Interceptor para capturar 401 (token expirado)
+  // Interceptor para capturar 401 (cuando el refresh falla) y forzar logout
   useEffect(() => {
     const id = api.interceptors.response.use(
-      (res) => res,
-      (err) => {
+      res => res,
+      err => {
         if (err.response?.status === 401) {
+          // Limpiamos estado y redirigimos al login con banner de expiración
           localStorage.removeItem("token");
           setToken(null);
           navigate("/login", { replace: true, state: { expired: true } });
@@ -32,16 +33,18 @@ export function AuthProvider({ children }) {
         return Promise.reject(err);
       }
     );
-    return () => api.interceptors.response.eject(id);
+    return () => {
+      api.interceptors.response.eject(id);
+    };
   }, [navigate]);
 
-  // login: guarda el access token
-  const login = (accessToken) => {
+  // login: almacenar accessToken en localStorage y en estado
+  const login = accessToken => {
     localStorage.setItem("token", accessToken);
     setToken(accessToken);
   };
 
-  // logout: limpia y redirige
+  // logout: borrar token y redirigir al login con banner de “fromLogout”
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
