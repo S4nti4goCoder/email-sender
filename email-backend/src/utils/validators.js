@@ -1,7 +1,5 @@
-// email-backend/validators.js
 const { body, validationResult } = require("express-validator");
 
-// Validaciones para /api/register
 const registerValidation = [
   body("email").isEmail().withMessage("El email no es válido"),
   body("password")
@@ -10,29 +8,24 @@ const registerValidation = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      // Solo devolvemos el primer error
-      const { msg } = errors.array()[0];
+      const [{ msg }] = errors.array();
       return res.status(400).json({ error: msg });
     }
     next();
   },
 ];
 
-// Validaciones para /api/login
 const loginValidation = [
   body("email").isEmail().withMessage("El email no es válido"),
   body("password").notEmpty().withMessage("La contraseña es requerida"),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const { msg } = errors.array()[0];
+      const [{ msg }] = errors.array();
       return res.status(400).json({ error: msg });
     }
     next();
   },
 ];
 
-module.exports = {
-  registerValidation,
-  loginValidation,
-};
+module.exports = { registerValidation, loginValidation };
