@@ -273,7 +273,7 @@ export default function Login() {
           {/* Links */}
           <p className="mt-4 text-center text-gray-600 text-sm">
             <span
-              onClick={() => alert("Funcionalidad no implementada")}
+              onClick={() => navigate("/forgot-password")}
               className="text-[#082563] hover:underline cursor-pointer font-medium"
             >
               ¿Olvidaste tu contraseña?
