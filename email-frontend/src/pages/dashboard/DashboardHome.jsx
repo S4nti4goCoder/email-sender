@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import {
   PaperAirplaneIcon,
@@ -14,22 +15,31 @@ import { getDashboardStats } from "../../services/api";
 import Alert from "../../components/ui/Alert";
 
 export default function DashboardHome() {
+  const location = useLocation();
   const [stats, setStats] = useState(null);
   const [recentActivity, setRecentActivity] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [showWelcome, setShowWelcome] = useState(true);
+  
+  // 🎯 Estado para el toast de bienvenida
+  const [showWelcomeToast, setShowWelcomeToast] = useState(false);
 
   useEffect(() => {
-    loadDashboardData();
+    // Verificar ÚNICAMENTE si viene del login por location.state (NO sessionStorage)
+    const comesFromLogin = location.state?.fromLogin;
     
-    // Timer para ocultar el mensaje de bienvenida después de 10 segundos
-    const welcomeTimer = setTimeout(() => {
-      setShowWelcome(false);
-    }, 10000);
+    if (comesFromLogin) {
+      // Mostrar toast de bienvenida INMEDIATAMENTE
+      setShowWelcomeToast(true);
+      
+      // Limpiar el state para que no persista en el historial
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
-    // Limpiar el timer si el componente se desmonta
-    return () => clearTimeout(welcomeTimer);
+  useEffect(() => {
+    // Cargar datos del dashboard en un useEffect separado
+    loadDashboardData();
   }, []);
 
   const loadDashboardData = async () => {
@@ -126,6 +136,18 @@ export default function DashboardHome() {
 
   return (
     <DashboardLayout title="Dashboard">
+      {/* 🎯 Toast de bienvenida - Solo aparece inmediatamente al venir del login */}
+      {showWelcomeToast && (
+        <Alert
+          type="success"
+          isToast={true}
+          duration={4000}
+          onClose={() => setShowWelcomeToast(false)}
+        >
+          Bienvenido al sistema
+        </Alert>
+      )}
+
       <div className="space-y-6">
         {error && (
           <Alert type="error">
@@ -139,27 +161,21 @@ export default function DashboardHome() {
           </Alert>
         )}
 
-        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white transition-all duration-1000">
-          {showWelcome ? (
-            // Mensaje inicial de bienvenida (primeros 10 segundos)
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-white">
-                ¡Bienvenido de vuelta!
+        {/* Banner de resumen */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h2 className="text-3xl font-bold text-white mb-2">
+                Dashboard
               </h2>
+              <p className="text-blue-100 text-xl font-medium">
+                Aquí tienes un resumen de la actividad de tu sistema de emails.
+              </p>
             </div>
-          ) : (
-            // Descripción + ícono (después de 10 segundos)
-            <div className="flex items-center justify-between">
-              <div className="flex-1 text-center">
-                <p className="text-blue-100 text-xl font-medium">
-                  Aquí tienes un resumen de la actividad de tu sistema de emails.
-                </p>
-              </div>
-              <div className="hidden md:block ml-6">
-                <ChartBarIcon className="w-16 h-16 text-blue-200" />
-              </div>
+            <div className="hidden md:block ml-6">
+              <ChartBarIcon className="w-16 h-16 text-blue-200" />
             </div>
-          )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -200,7 +216,6 @@ export default function DashboardHome() {
                               {stat.change}
                               <InformationCircleIcon className="w-4 h-4 ml-1 opacity-60 hover:opacity-100 transition-opacity" />
 
-                              {/* Tooltip mejorado - sale del contenedor */}
                               <div className="invisible group-hover:visible absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-4 py-3 bg-gray-900 text-white text-sm rounded-xl shadow-2xl w-64 z-[100] border border-gray-700">
                                 <div className="font-medium text-white leading-relaxed">
                                   {stat.tooltip}

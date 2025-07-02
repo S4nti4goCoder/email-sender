@@ -95,16 +95,12 @@ export default function Login() {
       setBannerType("login");
       setInfo("✔️ Has iniciado sesión correctamente.");
 
-      // wait a moment, then redirect
-      setTimeout(() => {
-        setIsLoading(false);
-        // Marcar que viene del login para mostrar bienvenida
-        sessionStorage.setItem("fromLogin", "true");
-        navigate("/dashboard", {
-          replace: true,
-          state: { fromLogin: true },
-        });
-      }, 2000);
+      // 🎯 Navegar INMEDIATAMENTE (sin setTimeout)
+      setIsLoading(false);
+      navigate("/dashboard", {
+        replace: true,
+        state: { fromLogin: true },
+      });
     } catch (err) {
       // on error, clear loading/banner info and show error
       setIsLoading(false);
