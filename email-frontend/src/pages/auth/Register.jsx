@@ -7,7 +7,7 @@ import {
   EyeIcon,
   EyeSlashIcon,
 } from "@heroicons/react/24/outline";
-import { register as apiRegister } from "../services/api";
+import { register as apiRegister } from "../../services/api";
 
 export default function Register() {
   const navigate = useNavigate();

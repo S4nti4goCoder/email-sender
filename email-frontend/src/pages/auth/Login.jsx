@@ -7,8 +7,8 @@ import {
   EyeIcon,
   EyeSlashIcon,
 } from "@heroicons/react/24/outline";
-import { login as apiLogin } from "../services/api";
-import { useAuth } from "../context/AuthContext";
+import { login as apiLogin } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();

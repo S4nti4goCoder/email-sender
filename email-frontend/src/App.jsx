@@ -2,14 +2,14 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
-import Login from "./pages/Login.jsx";
-import Register from "./pages/Register.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-import ForgotPassword from "./pages/ForgotPassword.jsx";
-import ResetPassword from "./pages/ResetPassword.jsx";
+import Login from "./pages/auth/Login.jsx";
+import Register from "./pages/auth/Register.jsx";
+import DashboardHome from "./pages/dashboard/DashboardHome.jsx";
+import ForgotPassword from "./pages/auth/ForgotPassword.jsx";
+import ResetPassword from "./pages/auth/ResetPassword.jsx";
 
-import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import PublicRoute from "./components/PublicRoute.jsx";
+import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
+import PublicRoute from "./components/auth/PublicRoute.jsx";
 
 export default function App() {
   return (
@@ -56,7 +56,7 @@ export default function App() {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <DashboardHome />
           </ProtectedRoute>
         }
       />
