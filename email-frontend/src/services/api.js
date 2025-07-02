@@ -143,3 +143,11 @@ export function getEmails() {
 export function sendEmail(data) {
   return API.post("/api/emails", data).then((res) => res.data);
 }
+
+/**
+ * Obtiene estadísticas del dashboard (ruta protegida)
+ * @returns {Promise<{ stats: object, recentActivity: Array<any> }>}
+ */
+export function getDashboardStats() {
+  return API.get("/api/dashboard/stats").then((res) => res.data);
+}

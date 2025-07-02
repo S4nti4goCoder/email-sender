@@ -5,6 +5,7 @@ const { FRONTEND_URL } = require("./config");
 const authRoutes = require("./routes/auth.routes");
 const emailRoutes = require("./routes/email.routes");
 const passwordResetRoutes = require("./routes/passwordReset.routes");
+const dashboardRoutes = require("./routes/dashboard.routes"); // 👈 NUEVA LÍNEA
 const errorHandler = require("./middlewares/error.middleware");
 
 const app = express();
@@ -42,7 +43,8 @@ app.use(cookieParser());
 // Rutas de la aplicación
 app.use("/api", authRoutes);
 app.use("/api/emails", emailRoutes);
-app.use("/api/password-reset", passwordResetRoutes); // 👈 NUEVA RUTA
+app.use("/api/password-reset", passwordResetRoutes);
+app.use("/api/dashboard", dashboardRoutes); // 👈 NUEVA LÍNEA
 
 // middleware global de errores
 app.use(errorHandler);

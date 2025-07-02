@@ -98,6 +98,8 @@ export default function Login() {
       // wait a moment, then redirect
       setTimeout(() => {
         setIsLoading(false);
+        // Marcar que viene del login para mostrar bienvenida
+        sessionStorage.setItem("fromLogin", "true");
         navigate("/dashboard", {
           replace: true,
           state: { fromLogin: true },
