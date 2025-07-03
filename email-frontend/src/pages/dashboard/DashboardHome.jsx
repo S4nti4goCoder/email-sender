@@ -10,6 +10,8 @@ import {
   ClockIcon,
   DocumentTextIcon,
   InformationCircleIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
 } from "@heroicons/react/24/outline";
 import { getDashboardStats } from "../../services/api";
 import Alert from "../../components/ui/Alert";
@@ -23,6 +25,9 @@ export default function DashboardHome() {
   
   // 🎯 Estado para el toast de bienvenida
   const [showWelcomeToast, setShowWelcomeToast] = useState(false);
+  
+  // 🎯 NUEVO: Estado para controlar "Ver más"
+  const [showAllActivity, setShowAllActivity] = useState(false);
 
   useEffect(() => {
     // Verificar ÚNICAMENTE si viene del login por location.state (NO sessionStorage)
@@ -57,6 +62,17 @@ export default function DashboardHome() {
       setLoading(false);
     }
   };
+
+  // 🎯 NUEVA FUNCIÓN: Determinar qué actividades mostrar
+  const getDisplayedActivity = () => {
+    if (showAllActivity) {
+      return recentActivity;
+    }
+    return recentActivity.slice(0, 5); // Solo los primeros 5
+  };
+
+  const displayedActivity = getDisplayedActivity();
+  const hasMoreActivity = recentActivity.length > 5;
 
   const getStatsConfig = (stats) => [
     {
@@ -237,9 +253,18 @@ export default function DashboardHome() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                Actividad Reciente
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  Actividad Reciente
+                </h3>
+                {/* 🎯 NUEVO: Contador de actividades */}
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  {showAllActivity 
+                    ? `${recentActivity.length} actividades` 
+                    : `${Math.min(5, recentActivity.length)} de ${recentActivity.length}`
+                  }
+                </span>
+              </div>
             </div>
             <div className="p-6">
               {recentActivity.length === 0 ? (
@@ -255,10 +280,10 @@ export default function DashboardHome() {
               ) : (
                 <div className="flow-root">
                   <ul className="-mb-8">
-                    {recentActivity.map((activity, activityIdx) => (
+                    {displayedActivity.map((activity, activityIdx) => (
                       <li key={activity.id}>
                         <div className="relative pb-8">
-                          {activityIdx !== recentActivity.length - 1 ? (
+                          {activityIdx !== displayedActivity.length - 1 ? (
                             <span
                               className="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-600"
                               aria-hidden="true"
@@ -312,6 +337,28 @@ export default function DashboardHome() {
                       </li>
                     ))}
                   </ul>
+                  
+                  {/* 🎯 NUEVO: Botón Ver más / Ver menos */}
+                  {hasMoreActivity && (
+                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                      <button
+                        onClick={() => setShowAllActivity(!showAllActivity)}
+                        className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors duration-200"
+                      >
+                        {showAllActivity ? (
+                          <>
+                            <ChevronUpIcon className="w-4 h-4 mr-2" />
+                            Ver menos
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDownIcon className="w-4 h-4 mr-2" />
+                            Ver más actividades ({recentActivity.length - 5} más)
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
