@@ -4,7 +4,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/auth/Login.jsx";
 import Register from "./pages/auth/Register.jsx";
-import DashboardHome from "./pages/dashboard/DashboardHome.jsx";
+import DashboardHome from "./pages/dashboard/home/DashboardHome.jsx";
+import SendEmail from "./pages/dashboard/email/SendEmail.jsx";
 import ForgotPassword from "./pages/auth/ForgotPassword.jsx";
 import ResetPassword from "./pages/auth/ResetPassword.jsx";
 
@@ -51,12 +52,22 @@ export default function App() {
         }
       />
 
-      {/* ruta protegida: Dashboard solo si ESTÁS autenticado */}
+      {/* rutas protegidas: Dashboard solo si ESTÁS autenticado */}
       <Route
         path="/dashboard"
         element={
           <ProtectedRoute>
             <DashboardHome />
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Nueva ruta: Enviar Email */}
+      <Route
+        path="/dashboard/send"
+        element={
+          <ProtectedRoute>
+            <SendEmail />
           </ProtectedRoute>
         }
       />

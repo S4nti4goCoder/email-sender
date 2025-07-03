@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import DashboardLayout from "../../components/layout/DashboardLayout";
+import DashboardLayout from "../../../components/layout/DashboardLayout";
 import {
   PaperAirplaneIcon,
   UsersIcon,
@@ -13,8 +13,8 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
 } from "@heroicons/react/24/outline";
-import { getDashboardStats } from "../../services/api";
-import Alert from "../../components/ui/Alert";
+import { getDashboardStats } from "../../../services/api";
+import Alert from "../../../components/ui/Alert";
 
 export default function DashboardHome() {
   const location = useLocation();
